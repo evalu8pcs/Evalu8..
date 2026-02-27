@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Evalu8 Tender Pro</title>
+
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<style>
+body { font-family: -apple-system; margin: 20px; background: #f2f2f7; }
+.card { background: white; padding: 20px; border-radius: 16px; margin-bottom: 14px; }
+input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 18px; }
+.value { font-weight: 600; }
+h2 { margin-top: 0; }
+.logo { width: 120px; display: block; margin: 0 auto 20px; }
+</style>
+</head>
+
+<body>
+
+<img src="logo.png" class="logo" alt="Logo">
+
+<div class="card">
+<h2>Evalu8 Tender Pro</h2>
+
+Calculation Mode:
+<select id="mode">
+  <option value="margin">Margin %</option>
+  <option value="profit">Profit Target (£)</option>
+  <option value="markup">Markup %</option>
+</select>
+
+Cost:
+<input id="c" type="number" inputmode="decimal">
+
+<div id="marginBlock">
+  Margin %:
+  <input id="m" value="7.5" type="number" inputmode="decimal">
+</div>
+
+<div id="profitBlock" style="display:none;">
+  Profit Target (£):
+  <input id="pt" value="0" type="number" inputmode="decimal">
+</div>
+
+<div id="markupBlock" style="display:none;">
+  Markup %:
+  <input id="mk" value="0" type="number" inputmode="decimal">
+</div>
+
+</div>
+
+<div class="card">
+Sell: <span id="s" class="value">£0.00</span><br>
+Profit: <span id="p" class="value">£0.00</span><br>
+Margin: <span id="mg" class="value">0.00%</span><br>
+Markup: <span id="mu" class="value">0.00%</span>
+</div>
+
+<script>
+function updateVisibility() {
+  const mode = document.getElementById("mode").value;
+  document.getElementById("marginBlock").style.display = mode === "margin" ? "block" : "none";
+  document.getElementById("profitBlock").style.display = mode === "profit" ? "block" : "none";
+  document.getElementById("markupBlock").style.display = mode === "markup" ? "block" : "none";
+}
+
+function calc() {
+  let cost = parseFloat(document.getElementById("c").value) || 0;
+  let mode = document.getElementById("mode").value;
+
+  let sell = 0;
+  let profit = 0;
+  let margin = 0;
+  let markup = 0;
+
+  if (mode === "margin") {
+    let m = parseFloat(document.getElementById("m").value) / 100 || 0;
+    sell = cost / (1 - m);
+    profit = sell - cost;
+    margin = m * 100;
+    markup = (profit / cost) * 100;
+  }
+
+  if (mode === "profit") {
+    profit = parseFloat(document.getElementById("pt").value) || 0;
+    sell = cost + profit;
+    margin = (profit / sell) * 100;
+    markup = (profit / cost) * 100;
+  }
+
+  if (mode === "markup") {
+    let mk = parseFloat(document.getElementById("mk").value) / 100 || 0;
+    profit = cost * mk;
+    sell = cost + profit;
+    margin = (profit / sell) * 100;
+    markup = mk * 100;
+  }
+
+  document.getElementById("s").innerText = "£" + sell.toFixed(2);
+  document.getElementById("p").innerText = "£" + profit.toFixed(2);
+  document.getElementById("mg").innerText = margin.toFixed(2) + "%";
+  document.getElementById("mu").innerText = markup.toFixed(2) + "%";
+}
+
+document.getElementById("mode").addEventListener("change", () => {
+  updateVisibility();
+  calc();
+});
+
+document.querySelectorAll("input").forEach(el => el.addEventListener("input", calc));
+
+updateVisibility();
+</script>
+
+</body>
+</html>
